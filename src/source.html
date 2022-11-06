@@ -9,17 +9,14 @@
         * {
             background-color: white;
             color: black;
-            margin: 0;
-            padding: 0;
+            /* margin: 0;
+            padding: 0; */
             box-sizing: border-box;
             font-family: sans-serif;
             font-size: medium;
         }
         table {
             border-collapse: collapse;
-        }
-        tr {
-
         }
         td {
             font-size: 16px;
@@ -33,17 +30,45 @@
         td:hover {
             background-color: skyblue;
         }
+        .icon-button {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
+    <div class="icon-button">
+        <svg version="1.1" width="1em" height="1em">
+            <ellipse fill="red" cx="0.5em" cy="0.5em" rx="0.5em" ry="0.5em"/>
+        </svg>
+    </div>
     <table id="grid">
     </table>
 </body>
 <script>
-    const gridElement = document.getElementById('grid');
+    // Constants
     const gridWidth = 10;
     const gridHeight = 10;
+
+    // Session data
+    let state = 'a';
+    let currentStart = null;
+
+    // Stuff that happens when a cell is clicked
+    const gridClickEvent = (x, y) => ({ target = event.target ?? event.srcElement }) => {
+        target.innerHTML = state;
+        if (state === 'b') {
+            console.log(`${currentStart.x},${currentStart.y}`);
+            currentStart = null;
+        }
+        else if (state === 'a') {
+            currentStart = { x:x, y:y, element:target };
+        }
+        state = state === 'a' ? 'b' : 'a';
+    };
+
+    // Set up grid and events
     let grid = Array(gridHeight);
+    const gridElement = document.getElementById('grid');
     for (let y = 0; y < gridHeight; ++y) {
         grid[y] = Array(gridWidth);
         const rowElement = document.createElement("tr");
@@ -51,10 +76,7 @@
             const cellElement = document.createElement("td");
             rowElement.appendChild(cellElement);
             grid[y][x] = cellElement;
-            cellElement.addEventListener('click', (event) => {
-                const target = event.target ?? event.srcElement;
-                target.innerHTML = "e";
-            });
+            cellElement.addEventListener('click', gridClickEvent(x,y));
         }
         gridElement.appendChild(rowElement);
     }
